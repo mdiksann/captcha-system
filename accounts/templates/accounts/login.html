@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login Proyek Django</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+      .login-container {
+        max-width: 400px;
+        margin-top: 100px;
+      }
+      .captcha-container img {
+        border-radius: 8px;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container login-container">
+      <div class="card shadow">
+        <div class="card-body">
+          <h3 class="card-title text-center mb-4">Login System</h3>
+
+          {% if messages %} {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+          {% endfor %} {% endif %}
+
+          <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label class="form-label">Username</label>
+              {{ form.username.errors }}
+              <input type="text" name="username" class="form-control" placeholder="Masukkan username" />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Password</label>
+              {{ form.password.errors }}
+              <input type="password" name="password" class="form-control" placeholder="Masukkan password" />
+            </div>
+
+            <div class="mb-3 bg-light p-3 border rounded text-center">
+              <label class="form-label d-block">Verifikasi Keamanan</label>
+              {{ form.captcha }}
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Sign In</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(function () {
+        // Klik pada gambar captcha untuk refresh
+        $(".captcha").click(function () {
+          var $form = $(this).parents("form");
+          var url = location.protocol + "//" + window.location.hostname + (window.location.port ? ":" + window.location.port : "") + "/captcha/refresh/";
+
+          $.getJSON(url, {}, function (json) {
+            $form.find('input[name="captcha_0"]').val(json.key);
+            $form.find("img.captcha").attr("src", json.image_url);
+          });
+          return false;
+        });
+
+        // Tambahkan gaya kursor pointer agar user tahu gambar bisa diklik
+        $(".captcha").css("cursor", "pointer");
+        $(".captcha").attr("title", "Klik untuk ganti gambar");
+      });
+    </script>
+  </body>
+</html>
